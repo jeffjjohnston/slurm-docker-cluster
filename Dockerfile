@@ -127,8 +127,15 @@ RUN set -ex \
        readline \
        vim-enhanced \
        wget \
+       java-17-openjdk \
     && dnf clean all \
     && rm -rf /var/cache/dnf
+
+# Install nextflow
+RUN set -ex \
+    && curl -s https://get.nextflow.io | bash \
+    && chmod +x nextflow \
+    && mv nextflow /usr/local/bin/nextflow
 
 # Install gosu for privilege dropping
 ARG GOSU_VERSION=1.19
@@ -143,6 +150,14 @@ RUN set -ex \
     && rm -rf "${GNUPGHOME}" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true
+
+# Add a new user for submitting jobs
+ARG ADDITIONAL_USER=slurmuser
+ARG ADDITIONAL_UID=1005
+ARG ADDITIONAL_GID=1005
+
+RUN groupadd -g ${ADDITIONAL_GID} ${ADDITIONAL_USER} && \
+    useradd -m -u ${ADDITIONAL_UID} -g ${ADDITIONAL_GID} -s /bin/bash ${ADDITIONAL_USER}
 
 COPY --from=builder /root/rpmbuild/RPMS/*/*.rpm /tmp/rpms/
 
