@@ -1,0 +1,5 @@
+fluent/*.db*
+loki/data
+nextflow/runs
+nextflow/work/*
+slurmuser-home/*
