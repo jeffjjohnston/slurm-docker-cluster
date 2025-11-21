@@ -76,7 +76,10 @@ status:  ## Show cluster status
 	@echo "=== Cluster ==="
 	@docker exec slurmctld sinfo 2>/dev/null || echo "Not ready"
 
-shell:  ## Open shell in slurmctld
+shell:  ## Open shell in slurmctld as slurmuser
+	docker exec -it -u slurmuser -w /home/slurmuser slurmctld bash --login
+
+root-shell:  ## Open shell in slurmctld
 	docker exec -it slurmctld bash
 
 logs-slurmctld:  ## Show slurmctld logs

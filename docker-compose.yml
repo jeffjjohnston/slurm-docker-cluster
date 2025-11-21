@@ -62,6 +62,8 @@ services:
       - etc_slurm:/etc/slurm:z
       - slurm_jobdir:/data:z
       - var_log_slurm:/var/log/slurm:z
+      - ./volumes/nextflow:/nextflow:z
+      - ./volumes/slurmuser-home:/home/slurmuser:z
     expose:
       - "6817"
     depends_on:
@@ -114,6 +116,8 @@ services:
       - etc_slurm:/etc/slurm
       - slurm_jobdir:/data
       - var_log_slurm:/var/log/slurm
+      - ./volumes/nextflow:/nextflow:z
+      - ./volumes/slurmuser-home:/home/slurmuser:z
     expose:
       - "6818"
     depends_on:
@@ -140,6 +144,8 @@ services:
       - etc_slurm:/etc/slurm
       - slurm_jobdir:/data
       - var_log_slurm:/var/log/slurm
+      - ./volumes/nextflow:/nextflow:z
+      - ./volumes/slurmuser-home:/home/slurmuser:z
     expose:
       - "6818"
     depends_on:
@@ -153,6 +159,45 @@ services:
       timeout: 5s
       retries: 3
       start_period: 20s
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    command: ["-config.file=/etc/loki/config.yaml"]
+    ports:
+      - "3100:3100"
+    expose:
+      - "3100"
+    volumes:
+      - ./volumes/loki/loki-config.yaml:/etc/loki/config.yaml:ro
+      - ./volumes/loki/data:/loki
+    networks:
+      - slurm-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - loki
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    networks:
+      - slurm-network
+    restart: unless-stopped
+
+  fluentbit:
+    image: fluent/fluent-bit:latest
+    container_name: fluentbit
+    command: ["-c", "/fluent/fluent-bit.conf"]
+    volumes:
+      - ./volumes/nextflow:/nextflow:ro
+      - ./volumes/fluent:/fluent
+    networks:
+      - slurm-network
+    restart: unless-stopped
 
 volumes:
   etc_munge:
