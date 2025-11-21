@@ -1,5 +1,22 @@
 nextflow.enable.dsl = 2
 
+def jsonHeader(task, sample_id) {
+    def process = task.process
+    def attempt = task.attempt
+    
+    """\
+    printf '{"nf_meta":true,"workflow":"%s","nextflow_run":"%s","process":"%s","sample":"%s","attempt":"%s","user":"%s","slurm_job_id":"%s","slurm_node":"%s"}\\n' \
+        "\${WORKFLOW_NAME:-unknown}" \
+        "\${RUN_NAME:-unknown}" \
+        "${process}" \
+        "${sample_id}" \
+        "${attempt}" \
+        "\${USER:-unknown}" \
+        "\${SLURM_JOB_ID:-none}" \
+        "\${SLURM_NODELIST:-none}" | tee /dev/stderr
+    """.stripIndent()
+}
+
 params.sample_id = params.sample_id ?: 'SAMPLE1'
 params.reads1    = params.reads1    ?: 'data/SAMPLE1_R1.fastq.gz'
 params.reads2    = params.reads2    ?: 'data/SAMPLE1_R2.fastq.gz'
@@ -20,6 +37,7 @@ process ALIGN {
 
     script:
     """
+    ${jsonHeader(task, sample_id)}
     echo "Starting alignment for sample: ${sample_id}"
     echo "R1: ${reads1}"
     echo "R2: ${reads2}"
@@ -53,6 +71,7 @@ process CALL_VARIANTS {
 
     script:
     """
+    ${jsonHeader(task, sample_id)}
     echo "Sample: ${sample_id}"
     echo "BAM: ${bam}"
 
@@ -75,6 +94,7 @@ process COVERAGE_QC {
 
     script:
     """
+    ${jsonHeader(task, sample_id)}
     echo "Sample: ${sample_id}"
     echo "BAM: ${bam}"
     echo "metric\tvalue"            >  ${sample_id}.coverage_qc.txt
@@ -96,6 +116,7 @@ process ANNOTATE_VCF {
 
     script:
     """
+    ${jsonHeader(task, sample_id)}
     echo "Sample: ${sample_id}"
     echo "VCF: ${vcf_gz}"
     echo "Annotated VCF" > ${sample_id}.annotated.vcf.gz
@@ -117,6 +138,7 @@ process SUBMIT_TO_DB {
 
     script:
     """
+    ${jsonHeader(task, sample_id)}
     echo "Sample: ${sample_id}"
     echo "BAM: ${bam}"
     echo "VCF: ${vcf_gz}"
