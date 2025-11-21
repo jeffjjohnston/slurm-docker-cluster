@@ -51,6 +51,13 @@ function enrich_nextflow_metadata(tag, ts, record)
         end
     end
 
+    -- Assign stream based on file name: .command.err is stderr, others are stdout
+    if file:match("%.command%.err$") then
+        record["stream"] = "stderr"
+    else
+        record["stream"] = "stdout"
+    end
+
     record["source"] = "nextflow"
 
     return 1, ts, record
