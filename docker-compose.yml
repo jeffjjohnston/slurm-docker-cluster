@@ -160,6 +160,34 @@ services:
       retries: 3
       start_period: 20s
 
+  c3:
+    image: slurm-docker-cluster:${SLURM_VERSION:-25.05.3}
+    command: ["slurmd"]
+    container_name: c3
+    hostname: c3
+    working_dir: /data
+    privileged: true
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - slurm_jobdir:/data
+      - var_log_slurm:/var/log/slurm
+      - ./volumes/nextflow:/nextflow:z
+      - ./volumes/slurmuser-home:/home/slurmuser:z
+    expose:
+      - "6818"
+    depends_on:
+      slurmctld:
+        condition: service_healthy
+    networks:
+      - slurm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pidof slurmd"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
   loki:
     image: grafana/loki:latest
     container_name: loki
