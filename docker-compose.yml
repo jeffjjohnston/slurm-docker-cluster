@@ -201,7 +201,6 @@ services:
       - ./volumes/loki/data:/loki
     networks:
       - slurm-network
-    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
@@ -214,7 +213,6 @@ services:
       - "3000"
     networks:
       - slurm-network
-    restart: unless-stopped
 
   fluentbit:
     image: fluent/fluent-bit:latest
@@ -225,7 +223,6 @@ services:
       - ./volumes/fluent:/fluent
     networks:
       - slurm-network
-    restart: unless-stopped
 
 volumes:
   etc_munge:
