@@ -17,6 +17,14 @@ def jsonHeader(task, sample_id) {
     """.stripIndent()
 }
 
+def complete(task) {
+    def process = task.process
+
+    """
+    printf 'Process \"%s\" completed successfully.\\n' "${process}"
+    """.stripIndent()
+}
+
 def randomError(message, chance_per_thousand) {
     """
     if (( RANDOM % 1000 < ${chance_per_thousand} )); then
@@ -60,6 +68,7 @@ process ALIGN {
  
     # Demo: just create a dummy BAM file
     echo "DUMMY_BAM_CONTENT" > ${sample_id}.aligned.bam
+    ${complete(task)}
     """
 }
 
@@ -89,6 +98,8 @@ process CALL_VARIANTS {
 
     printf "VCF_OUTPUT" > ${sample_id}.variants.vcf
     gzip -c ${sample_id}.variants.vcf > ${sample_id}.variants.vcf.gz
+    rm ${sample_id}.variants.vcf
+    ${complete(task)}
     """
 }
 
@@ -118,6 +129,7 @@ process COVERAGE_QC {
     echo "metric\tvalue"            >  ${sample_id}.coverage_qc.txt
     echo "mean_coverage\t42"       >> ${sample_id}.coverage_qc.txt
     echo "pct_10x\t0.98"           >> ${sample_id}.coverage_qc.txt
+    ${complete(task)}
     """
 }
 
@@ -144,6 +156,7 @@ process ANNOTATE_VCF {
     done
 
     echo "Annotated VCF" > ${sample_id}.annotated.vcf.gz
+    ${complete(task)}
     """
 }
 
@@ -179,6 +192,7 @@ process SUBMIT_TO_DB {
   "status":    "READY_FOR_SUBMISSION"
 }
 EOF
+    ${complete(task)}
     """
 }
 
