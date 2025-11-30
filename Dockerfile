@@ -124,6 +124,7 @@ RUN set -ex \
        procps-ng \
        psmisc \
        python3 \
+       python3.12 \
        readline \
        vim-enhanced \
        wget \
@@ -226,6 +227,9 @@ RUN set -ex \
     && chmod 600 /etc/slurm/slurmdbd.conf \
     && rm -rf /tmp/slurm-config
 COPY --chown=slurm:slurm --chmod=0600 examples /root/examples
+
+# add uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
