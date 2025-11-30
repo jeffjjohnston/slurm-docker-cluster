@@ -15,7 +15,8 @@ AGENT_INSTRUCTIONS = (Path(__file__).parent / "instructions.md").read_text()
 WORKFLOWS_BASE_PATH = Path("/nextflow/workflows")
 
 WORKFLOW_DEFINITIONS = {
-    "unreliable-exome": (WORKFLOWS_BASE_PATH / "unreliable-exome.nf").read_text()
+    "exome-fluent": (WORKFLOWS_BASE_PATH / "exome-fluent.nf").read_text(),
+    "unreliable-exome": (WORKFLOWS_BASE_PATH / "unreliable-exome.nf").read_text(),
 }
 
 
@@ -73,7 +74,10 @@ async def retrieve_workflow_definition(workflow_file: str) -> str:
         workflow_file = workflow_file[:-3]
     if workflow_file in WORKFLOW_DEFINITIONS:
         return WORKFLOW_DEFINITIONS[workflow_file]
-    return f"Workflow definition for {workflow_file} not found."
+    return (
+        f"Workflow definition for {workflow_file} not found. "
+        f"Workflows available: {', '.join(list(WORKFLOW_DEFINITIONS.keys()))}"
+    )
 
 
 async def main():
