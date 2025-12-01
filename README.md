@@ -1,3 +1,12 @@
+# About This Fork
+
+This fork of [giovtorres/slurm-docker-cluster](https://github.com/giovtorres/slurm-docker-cluster.git) implements changes related to the following two blog posts:
+
+- [Observability in genomic workflows: Part 1](https://jeffjjohnston.github.io/2025/11/22/observability-in-genomics-part-1/)
+- [Observability part 2: AI assistance](https://jeffjjohnston.github.io/2025/11/30/observability-in-genomics-part-2/)
+
+Original README.md follows:
+
 # Slurm Docker Cluster
 
 <p align="center">
